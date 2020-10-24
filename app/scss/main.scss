@@ -26,9 +26,11 @@
 
 .wrapper{
   @include paddingWrapper(1000px,16px);
+
 }
 body{
   @include adaptiveFont(400, 1000, 14, 21);
+  padding-top:1.6em;
 }
 
 h1,h2,h3,h4{
@@ -37,5 +39,5 @@ h1,h2,h3,h4{
 
 p+h1,p+h2,p+h3{
   margin-top: 1.6em;
-  left: 0;
+
 }
