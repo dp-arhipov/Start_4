@@ -5,13 +5,13 @@
       padding: 0 16px; } }
 
 body {
-  --font_size: 14px;
+  --font_size: 16px;
   font-size: var(--font_size);
   line-height: 1.6em;
   padding-top: 1.6em; }
   @media (min-width: 400px) and (max-width: 1000px) {
     body {
-      --font_size: calc(14px + (21 - 14) * ((100vw - 400px) / (1000 - 400))); } }
+      --font_size: calc(16px + (21 - 16) * ((100vw - 400px) / (1000 - 400))); } }
   @media (min-width: 1000px) {
     body {
       --font_size: 21px; } }
@@ -20,4 +20,4 @@ h1, h2, h3, h4 {
   margin-bottom: 0.6em; }
 
 p + h1, p + h2, p + h3 {
-  margin-top: 1.6em; }
+  margin-top: 2.6em; }
