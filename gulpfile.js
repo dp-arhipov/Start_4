@@ -1,6 +1,6 @@
 // VARIABLES & PATHS
 
-let preprocessor = 'sass', // Preprocessor (sass, scss, less, styl)
+let preprocessor = 'scss', // Preprocessor (sass, scss, less, styl)
     fileswatch   = 'html,htm,txt,json,md,woff2', // List of files extensions for watching & hard reload (comma separated)
     imageswatch  = 'jpg,jpeg,png,webp,svg', // List of images extensions for watching & compression (comma separated)
     baseDir      = 'app', // Base directory path without «/» at the end
@@ -76,7 +76,7 @@ function styles() {
 	.pipe(eval(preprocessor)())
 	.pipe(concat(paths.cssOutputName))
 	.pipe(autoprefixer({ overrideBrowserslist: ['last 10 versions'], grid: true }))
-	.pipe(cleancss( {level: { 1: { specialComments: 0 } },/* format: 'beautify' */ }))
+	//.pipe(cleancss( {level: { 1: { specialComments: 0 } },/* format: 'beautify' */ }))
 	.pipe(dest(paths.styles.dest))
 	.pipe(browserSync.stream())
 }

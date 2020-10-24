@@ -1,5 +1,40 @@
 @import 'config';
 
 // CUSTOM USER STYLES & IMPORTS
+@mixin paddingWrapper($wrap-width,$wrap-padding){//ширина контента, отступы на маленьких экранах
+  padding: 0 calc(50vw - #{$wrap-width} / 2);
+  @media (max-width: $wrap-width + $wrap-padding*2){
+    padding: 0 $wrap-padding;
+  }
+}
+
+@mixin adaptiveFont($min_width, $max_width, $min-font, $max-font){
+  --font_size: #{$min-font}px;
+  @media (min-width: #{$min-width}px) and (max-width: #{$max-width}px) {
+    --font_size: calc(#{$min-font}px + (#{$max-font} - #{$min-font}) * ((100vw - #{$min_width}px) / (#{$max_width} - #{$min_width})));
+  }
+
+  @media (min-width: #{$max-width}px) {
+    --font_size: #{$max-font}px;
+  }
+
+  font-size: var(--font_size);
+  line-height: 1.6em;
+
+}
 
 
+.wrapper{
+  @include paddingWrapper(1000px,16px);
+}
+body{
+  @include adaptiveFont(400, 1000, 14, 21);
+}
+
+h1,h2,h3,h4{
+  margin-bottom: 0.6em;
+}
+
+p+h1,p+h2,p+h3{
+  margin-top: 1.6em;
+}
