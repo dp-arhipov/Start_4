@@ -1,43 +1,501 @@
 @import 'config';
 
-// CUSTOM USER STYLES & IMPORTS
-@mixin paddingWrapper($wrap-width,$wrap-padding){//ширина контента, отступы на маленьких экранах
-  padding: 0 calc(50vw - #{$wrap-width} / 2);
-  @media (max-width: $wrap-width + $wrap-padding*2){
-    padding: 0 $wrap-padding;
+@mixin reset($choise){//сброс нужных элементов
+  @if $choise == last-margin-right{//lastRightMargin
+    &:last-child{
+      margin-right: 0;
+    }
+  }
+
+  @if $choise == last-margin-bottom{//lastBottomMargin
+    &:last-child{
+      margin-bottom: 0;
+    }
+  }
+
+  @if $choise == all { //css reset
+    & * {
+      //transition: 0.1s ease;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-size: inherit;
+    }
+    a, a:hover {
+      //display: inline-block;
+      color: inherit;
+      text-decoration: none;
+    }
+    button {
+      outline: none;
+      //font-size: inherit;
+    }
+    ul {
+      list-style-type: none;
+    }
+    input:focus {
+      outline: none;
+    }
+
   }
 }
 
-@mixin adaptiveFont($min_width, $max_width, $min-font, $max-font){
-  --font_size: #{$min-font}px;
-  @media (min-width: #{$min-width}px) and (max-width: #{$max-width}px) {
-    --font_size: calc(#{$min-font}px + (#{$max-font} - #{$min-font}) * ((100vw - #{$min_width}px) / (#{$max_width} - #{$min_width})));
+@mixin btn{
+  border-radius: rem(10px);
+  padding: rem(16px) rem(58px);
+  border: 2px solid $clr-btn;
+  background-color: $clr-btn;
+  color: $clr-text--white;
+  //transition: 0.2s ease;
+  cursor: pointer;
+
+  &.-mini {
+    border-radius: rem(5px);
+    padding: rem(2.5px) rem(13px);
   }
 
-  @media (min-width: #{$max-width}px) {
-    --font_size: #{$max-font}px;
+  &:hover {
+    background-color: $clr-btn--hover;
+    border-color: $clr-btn--hover;
+    color: $clr-text--white;
+  }
+}
+
+//converters
+
+@function rem($value, $rem-font-size:getFontStyle(html, rem-font-size)) {
+
+  @if type-of($value) == "number" and (unit($value) == "rem" or unit($value) == "em" or unitless($value)){
+    @return $value;
+  } @else {
+    @return strip-unit($value) / strip-unit($rem-font-size) * 1rem;
   }
 
-  font-size: var(--font_size);
-  line-height: 1.6em;
+}
+@function strip-unit($number) {
+  @if type-of($number) == 'number' and not unitless($number) {
+    @return $number / ($number * 0 + 1);
+  }
+  @return $number;
+}
+
+
+@mixin paddingContainer($max-content-width, $paddingLR, $paddingInner:null, $paddingTB:null) { //ширина контента, отступ, отступ внутри блока контента, отступ сверху и снизу
+
+  @if $paddingTB!=null {
+    padding-top: $paddingTB;
+    padding-bottom: $paddingTB;
+  }
+
+  @if $paddingInner!=null {
+    padding-right: calc(50vw - #{$max-content-width } / 2 + #{$paddingInner});
+    padding-left: calc(50vw - #{$max-content-width} / 2 + #{$paddingInner});
+
+    @media (max-width: $max-content-width + $paddingLR * 2) {
+      padding-right: rem($paddingLR + $paddingInner);
+      padding-left: rem($paddingLR + $paddingInner);
+    }
+
+  } @else {
+
+    padding-right: calc(50vw - #{$max-content-width } / 2);
+    padding-left: calc(50vw - #{$max-content-width} / 2);
+
+    @media (max-width: $max-content-width + $paddingLR * 2) {
+      padding-right: rem($paddingLR);
+      padding-left: rem($paddingLR);
+    }
+  }
+}
+
+$colors: (
+        black: black,
+        blue: #5528FF,
+        white: #ffffff,
+        grey--light: #f7f7f7,
+        grey--medium: #C2C2C2,
+        grey--dark: #B2B2B2
+);
+@function getColor($key) {
+  @if map-has-key($colors, $key) {
+    @return map-get($colors, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $colors.";
+  @return null;
+}
+
+@function tint($color, $percentage) {
+  @return mix(white, $color, $percentage);
+}
+
+@function shade($color, $percentage) {
+  @return mix(black, $color, $percentage);
+}
+
+
+
+$clr-main:            getColor(white);
+$clr-secondary:       getColor(blue);
+$clr-third:           getColor(grey--light);
+$clr-text--white:     getColor(white);
+$clr-text--html:      getColor(black);
+$clr-text--line:      getColor(grey--medium);
+$clr-text--light:     getColor(grey--dark);
+$clr-btn:             getColor(blue);
+$clr-btn--hover:      shade(getColor(blue),10%);
+
+$break-points: (
+        xs: 0,
+        sm: 480px,
+        md: 768px,
+        lg: 992px,
+        xl: 1180px
+);
+@function getBp($key) {
+  @if map-has-key($break-points, $key) {
+    @return map-get($break-points, $key);
+  }
+
+  @warn "Unknown `#{$key}` in $break-points.";
+  @return null;
+}
+
+
+
+$font-styles: (
+        html:(
+                min-font-size: 16px,
+                max-font-size: 32px,
+                rem-font-size:32px,
+                line-height: 1.6,
+                font-family: ('Ubuntu', sans-serif)
+        ),
+        h1:(
+                font-size: 57px,
+                line-height: 1.2
+        ),
+        h3:(
+                font-size: 28px,
+                line-height: 32px
+        ),
+        p1:(
+                font-size: 32px,
+                line-height: 51.4px
+        ),
+        p2:(
+                font-size: 24px,
+                line-height: 27px
+        ),
+        p3:(
+                font-size: 14px,
+                line-height: 22px
+        ),
+  //text modifications
+        -bold: (
+                font-weight: bold
+        ),
+        -normal: (
+                font-weight: normal
+        ),
+        -light: (
+                color: $clr-text--light
+        ),
+        -line: (
+                color: $clr-text--line
+        ),
+        -uppercase: (
+                text-transform: uppercase
+        ),
+        -thin: (
+                font-weight: 300
+        ),
+);
+
+@function getFontStyle($tag, $rule) {
+      @return map-get(map-get($font-styles, $tag), $rule);
+}
+
+@mixin setFontStyles($tag,$mods...) {
+
+  $font-family: getFontStyle($tag, font-family);
+  @if $font-family {
+    font-family: $font-family;
+  }
+
+  $font-size: getFontStyle($tag, font-size);
+  @if $font-size{
+    font-size: rem($font-size);
+  }
+
+  $line-height: getFontStyle($tag, line-height);
+  @if $line-height{
+    line-height: rem($line-height);
+  }
+
+  $letter-spacing: getFontStyle($tag, letter-spacing);
+  @if $letter-spacing {
+    letter-spacing: rem($letter-spacing);
+  }
+
+  $font-weight: getFontStyle($tag, font-weight);
+  @if $font-weight{
+    font-weight: $font-weight;
+  }
+
+  $color: getFontStyle($tag, color);
+  @if $color {
+    color: $color;
+  }
+
+  $text-transform: getFontStyle($tag, text-transform);
+  @if $text-transform {
+    text-transform: $text-transform;
+  }
+
+  @each $mod in $mods {
+    @include setFontStyles("-"+$mod);
+  }
+
+}
+
+@mixin setFluidFontSize($f-min, $f-max, $w-min, $w-max, $fallback: false) {
+  font-size: $f-min;
+
+  @media (min-width: $w-min) {
+    @if ($fallback) {
+      font-size: $fallback;
+    }
+    font-size: calcFluidFontSize($f-min, $f-max, $w-min, $w-max, px);
+  }
+  @media (min-width: $w-max) {
+    font-size: $f-max;
+  }
+}
+
+@function calcFluidFontSize($f-min, $f-max, $w-min, $w-max, $units: px) {
+  $f-min: strip-unit($f-min);
+  $f-max: strip-unit($f-max);
+  $w-min: strip-unit($w-min);
+  $w-max: strip-unit($w-max);
+
+  $k: ($f-max - $f-min)/($w-max - $w-min);
+  $b: $f-min - $k * $w-min;
+
+  $b: $b + $units;
+
+  @return calc(#{$k} * 100vw + #{$b});
+}
+
+
+
+html {
+  @include reset(all);
+  @include setFluidFontSize(getFontStyle(html, min-font-size), getFontStyle(html, max-font-size), getBp(sm), getBp(xl));
+  @include setFontStyles(html);
+}
+
+.container {
+  @include paddingContainer(1120px, 62px);
+
+  position: relative;
+  &.-short{
+    @include paddingContainer(1120px, 62px, 50px, 50px);
+  }
+  &.-high{
+    @include paddingContainer(1120px, 62px, 0px, 100px);
+  }
+}
+
+
+.btn {
+  @include btn;
+}
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  //height: rem(300);
+  padding-top: rem(53px);
+
+  &__logo {
+    @include setFontStyles(p2, bold);
+  }
+
+  &__menu {
+    @include setFontStyles(p3, bold);
+    //flex-basis:30%;//ширина меню
+  }
+}
+
+.logo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: rem(88px);
+
+  &__img{
+    margin-right: rem(25px);
+    width: rem(48px);
+    height: rem(48px);
+    background: no-repeat center/contain url('../images/src/mamon-logo.svg');
+  }
+
+  &__name{
+
+  }
+}
+
+
+.menu{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  &__item{
+    margin-right: rem(27px);//для pixel perfect margin 37px
+    @include reset(last-margin-right);
+    white-space: nowrap;
+  }
+
+  &__link{
+    padding: rem(10px);//так удобнее нажимать на ссылку
+
+  }
+  &__btn{
+
+  }
 
 }
 
 
-.wrapper{
-  @include paddingWrapper(1000px,16px);
+.about{
+  position: relative;
+  &__title{
+    @include setFontStyles(h1);
+    margin-bottom: rem(35px);
+  }
 
+  &__text{
+    @include setFontStyles(p1);
+    width: 60%;
+    margin-bottom: rem(86px);
+  }
+
+  &__btn{
+    @include setFontStyles(p2);
+  }
 }
-body{
-  @include adaptiveFont(400, 1000, 16, 21);
-  padding-top:1.6em;
+
+
+.services{
+  border-top: 1px solid #C2C2C2;//черта
+  &__title{
+
+  }
+  &__grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap:rem(82px);
+    padding-left: 30px;
+    //@media (max-width: getBp(md)){
+    //   grid-template-columns: 1fr;
+    //}
+  }
+
+  &__card{
+
+  }
 }
 
-h1,h2,h3,h4{
-  margin-bottom: 0.6em;
+.card {
+  $this: &;
+  display: flex;
+  align-items: center;
+
+  &__img {
+    margin-right: rem(44px);
+    width: rem(58px);
+    height: rem(58px);
+  }
+
+  &__text-block {
+    width: rem(290px);
+
+    #{$this}__title {
+      @include setFontStyles(h3, normal);
+      padding-bottom: rem(17px);
+    }
+
+    #{$this}__text {
+      @include setFontStyles(p3, light);
+    }
+  }
+
+  &.-team{
+    #{$this}__text-block{
+      width: rem(150px);
+    }
+
+    #{$this}__img{
+      border-radius: 50%;
+    }
+
+  }
 }
 
-p+h1,p+h2,p+h3{
-  margin-top: 2.6em;
+.line-title{
+  @include setFontStyles(p3, uppercase, line, thin);
+  position: absolute;
+  top:rem(-11px);
+  background-color: #fff;
+  padding: 0 15px;
+}
 
+.clients{
+  border-top: 1px solid #C2C2C2;//черта
+  &__grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap:rem(60px);
+  }
+  &__img{
+    max-width: rem(180px);
+  }
+}
+
+
+.team{
+  border-top: 1px solid #C2C2C2;//черта;
+  &__grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:rem(60px);
+  }
+}
+
+
+.footer{
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: rem(100px);
+  background-color: $clr-third;
+  &__logo{
+
+  }
+  &__social{
+    @include setFontStyles(p2,light);
+  }
+}
+
+
+.social{
+  &__link{
+    margin-right: rem(30px);
+    @include reset(last-margin-right);
+    padding: rem(10px);
+  }
 }
