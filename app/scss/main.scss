@@ -146,7 +146,7 @@ $clr-btn:             getColor(blue);
 $clr-btn--hover:      shade(getColor(blue),10%);
 
 $break-points: (
-        xs: 0,
+        xs: 370px,
         sm: 480px,
         md: 768px,
         lg: 992px,
@@ -155,17 +155,20 @@ $break-points: (
 @function getBp($key) {
   @if map-has-key($break-points, $key) {
     @return map-get($break-points, $key);
-  }
-
-  @warn "Unknown `#{$key}` in $break-points.";
-  @return null;
+  }@else{
+} @return $key;
 }
 
+@mixin mq($breakpointName) {
+  @media screen and (max-width: #{getBp($breakpointName)}) {
+    @content;
+  }
+}
 
 
 $font-styles: (
         html:(
-                min-font-size: 16px,
+                min-font-size: 20px,
                 max-font-size: 32px,
                 rem-font-size:32px,
                 line-height: 1.6,
@@ -291,20 +294,21 @@ $font-styles: (
 
 html {
   @include reset(all);
-  @include setFluidFontSize(getFontStyle(html, min-font-size), getFontStyle(html, max-font-size), getBp(sm), getBp(xl));
+  @include setFluidFontSize(getFontStyle(html, min-font-size), getFontStyle(html, max-font-size), getBp(xs), getBp(xl));
   @include setFontStyles(html);
 }
 
 .container {
-  @include paddingContainer(1120px, 62px);
+  @include paddingContainer(1185px, 32px);
 
   position: relative;
   &.-short{
-    @include paddingContainer(1120px, 62px, 50px, 50px);
+    @include paddingContainer(1185px, 32px, 50px, 50px);
   }
   &.-high{
-    @include paddingContainer(1120px, 62px, 0px, 100px);
+    @include paddingContainer(1185px, 32px, 0px, 100px);
   }
+
 }
 
 
@@ -327,6 +331,10 @@ html {
   &__menu {
     @include setFontStyles(p3, bold);
     //flex-basis:30%;//ширина меню
+  }
+
+  @include mq(md){
+    flex-direction: column;
   }
 }
 
@@ -379,8 +387,11 @@ html {
 
   &__text{
     @include setFontStyles(p1);
-    width: 60%;
+    width: 70%;
     margin-bottom: rem(86px);
+    @include mq(sm){
+      width: 100%;
+    }
   }
 
   &__btn{
@@ -399,14 +410,17 @@ html {
     grid-template-columns: 1fr 1fr;
     gap:rem(82px);
     padding-left: 30px;
-    //@media (max-width: getBp(md)){
-    //   grid-template-columns: 1fr;
-    //}
+
+    @include mq(md){
+      grid-template-columns: 1fr;
+    }
   }
 
   &__card{
 
   }
+
+
 }
 
 .card {
@@ -460,6 +474,9 @@ html {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap:rem(60px);
+    @include mq(md){
+      grid-template-columns: 1fr 1fr;
+    }
   }
   &__img{
     max-width: rem(180px);
@@ -473,6 +490,12 @@ html {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap:rem(60px);
+    @include mq(md){
+      grid-template-columns: 1fr 1fr;
+    }
+    @include mq(xs){
+      grid-template-columns: 1fr;
+    }
   }
 }
 
